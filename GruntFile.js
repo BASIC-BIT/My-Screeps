@@ -111,13 +111,13 @@ module.exports = function (grunt) {
         src: ["src/**/*.js"],
         options: {
           mode: 'VERIFY_ONLY',
-          config: '.jsbeautifyrc'
-        }
-      }
+          config: '.jsbeautifyrc',
+        },
+      },
     },
 
     eslint: {
-      target: ['src/*.js']
+      target: ['src/**.js'],
     },
   });
 
@@ -128,5 +128,4 @@ module.exports = function (grunt) {
   grunt.registerTask('test', ['jsbeautifier:verify']);
   grunt.registerTask('pretty', ['jsbeautifier:modify']);
   grunt.registerTask('lint', ['eslint']);
-  grunt.registerTask('lint:fix', ['eslint --fix']);
-}
+};
