@@ -3,19 +3,19 @@ module.exports = function (grunt) {
   require('load-grunt-tasks')(grunt);
 
   // Pull defaults (including username and password) from .screeps.json
-  var config = require('./.screeps.json');
+  const config = require('./.screeps.json');
 
   // Allow grunt options to override default configuration
-  var branch = grunt.option('branch') || config.branch;
-  var email = grunt.option('email') || config.email;
-  var password = grunt.option('password') || config.password;
-  var ptr = grunt.option('ptr') ? true : config.ptr
-  var private_directory = grunt.option('private_directory') || config.private_directory;
+  const branch = grunt.option('branch') || config.branch;
+  const email = grunt.option('email') || config.email;
+  const password = grunt.option('password') || config.password;
+  const ptr = grunt.option('ptr') ? true : config.ptr;
+  const privateDirectory = grunt.option('private_directory') || config.private_directory;
 
 
-  var currentdate = new Date();
-  grunt.log.subhead('Task Start: ' + currentdate.toLocaleString())
-  grunt.log.writeln('Branch: ' + branch)
+  const currentDate = new Date();
+  grunt.log.subhead(`Task Start: ${currentDate.toLocaleString()}`);
+  grunt.log.writeln(`Branch: ${branch}`);
 
   // Load needed tasks
   grunt.loadNpmTasks('grunt-screeps');
@@ -35,12 +35,12 @@ module.exports = function (grunt) {
       options: {
         email,
         password,
-        branch: 'default',
-        ptr: false
+        branch,
+        ptr,
       },
       dist: {
-        src: ['dist/*.js']
-      }
+        src: ['src/*.js'],
+      },
     },
 
     watch: {
@@ -73,7 +73,7 @@ module.exports = function (grunt) {
           expand: true,
           cwd: 'src/',
           src: '**',
-          dest: private_directory,
+          dest: privateDirectory,
           filter: 'isFile',
           rename: (dest, src) => dest + src.replace(/\//g, '_'),
         }],
@@ -85,7 +85,7 @@ module.exports = function (grunt) {
       versioning: {
         files: [
           {
-            append: `\nglobal.SCRIPT_VERSION = ${currentdate.getTime()}\n`,
+            append: `\nglobal.SCRIPT_VERSION = ${currentDate.getTime()}\n`,
             input: 'src/version.js',
           },
         ],
@@ -95,20 +95,20 @@ module.exports = function (grunt) {
 
     // Remove all files from the dist folder.
     clean: {
-      'dist': ['dist']
+      dist: ['dist'],
     },
 
 
     // Apply code styling
     jsbeautifier: {
       modify: {
-        src: ["src/**/*.js"],
+        src: ['src/**/*.js'],
         options: {
-          config: '.jsbeautifyrc'
-        }
+          config: '.jsbeautifyrc',
+        },
       },
       verify: {
-        src: ["src/**/*.js"],
+        src: ['src/**/*.js'],
         options: {
           mode: 'VERIFY_ONLY',
           config: '.jsbeautifyrc',
@@ -122,7 +122,7 @@ module.exports = function (grunt) {
   });
 
   // Combine the above into a default task
-  grunt.registerTask('public', ['eslint', 'clean', 'screeps']);
+  grunt.registerTask('public', ['eslint', 'screeps']);
   grunt.registerTask('default', ['eslint', 'copy:private']);
   grunt.registerTask('dev', ['watch']);
   grunt.registerTask('test', ['jsbeautifier:verify']);
