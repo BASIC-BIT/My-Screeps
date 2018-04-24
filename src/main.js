@@ -11,6 +11,8 @@ module.exports.loop = function () {
     }
   }
 
+  Object.values(Game.rooms).map(room => room.refreshMemory());
+
   for (const name in Game.creeps) {
     const creep = Game.creeps[name];
     if (creep.checkLife()) {

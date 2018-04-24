@@ -54,9 +54,6 @@ module.exports = {
       // find source
       const source = creep.room.find(FIND_SOURCES)[creep.memory.sourceIndex];
       // try to harvest energy, if the source is not in range
-      if (creep.memory.target === 'W8N2') {
-        console.log(creep.harvest(source));
-      }
       if (creep.harvest(source) !== OK) {
         // move towards the source
         creep.moveTo(source);

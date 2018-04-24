@@ -1,12 +1,7 @@
-const listOfRoles = ['harvester', 'upgrader', 'builder', 'longDistanceHarvester', 'lorry', 'repairer', 'claimer'];
+/* eslint-disable no-unused-vars */
+const listOfRoles = ['harvester', 'upgrader', 'builder', 'longDistanceHarvester', 'lorry', 'repairer', 'claimer', 'reserver'];
 
 const randomName = () => Math.random().toString(36).substring(2, 7);
-
-StructureSpawn.prototype.getAvailableEnergy = function () {
-  return this.energy + _.sum(Game.spawns.Spawn1.room.find(FIND_MY_STRUCTURES, {
-    filter: { structureType: STRUCTURE_EXTENSION },
-  }).map(extension => extension.energy));
-};
 
 StructureSpawn.prototype.spawnCreepWithMemory = function (body, memory) {
   return this.spawnCreep(body, randomName(), {
@@ -17,10 +12,17 @@ StructureSpawn.prototype.spawnCreepWithMemory = function (body, memory) {
   });
 };
 
+StructureSpawn.prototype.hasRenewRoom = function () {
+  return this.pos.findInRange(FIND_MY_CREEPS, 1).length < 5;
+};
+
+StructureSpawn.prototype.shouldRenewCreep = function () {
+  return this.pos.findInRange(FIND_MY_CREEPS, 1).length < 5;
+};
+
 // create a new function for StructureSpawn
 StructureSpawn.prototype.spawnCreepsIfNecessary =
   function () {
-    console.log(`Energy (Room ${this.room.name}):  ${this.getAvailableEnergy()}`);
     this.memory.minCreeps = {
       harvester: 4,
       upgrader: 3,
@@ -29,6 +31,7 @@ StructureSpawn.prototype.spawnCreepsIfNecessary =
       longDistanceHarvester: 0,
       repairer: 2,
       claimer: 0,
+      reserver: 0,
     };
     this.memory.minLongDistanceHarvesters = {
       W8N2: 4, W7N3: 4, W6N3: 2, W7N4: 2, W7N2: 2,
@@ -44,9 +47,12 @@ StructureSpawn.prototype.spawnCreepsIfNecessary =
     const maxEnergy = room.energyCapacityAvailable;
     let name;
 
-    const renewTargets = this.pos.findInRange(FIND_MY_CREEPS, 1)
-      .filter(target => target.ticksToLive < 1450).map(target => this.renewCreep(target));
-    if (renewTargets.length > 0) {
+    const healTarget = this.pos.findInRange(FIND_MY_CREEPS, 1)
+      .filter(target => target.ticksToLive < 1450)
+      .map(target => this.renewCreep(target))
+      .find(response => response === OK);
+
+    if (healTarget) {
       return;
     }
 
@@ -103,7 +109,10 @@ StructureSpawn.prototype.spawnCreepsIfNecessary =
       }
     }
 
-    // this.checkLongDistanceHarvesters(name);
+    this.checkReservers(name);
+
+    this.checkLongDistanceHarvesters(name);
+
 
     // print name to console if spawning was a success
     // if (name && _.isString(name)) {
@@ -138,36 +147,47 @@ StructureSpawn.prototype.createCustomCreep = function (energy, roleName) {
   return this.spawnCreepWithMemory(body, { role: roleName, working: false });
 };
 
-// StructureSpawn.prototype.checkLongDistanceHarvesters = function (name) {
-// let rooms = {};
-// if (name === undefined) {
-//   for (let roomName in this.memory.minLongDistanceHarvesters) {
-//     if (Game.rooms[roomName] && Game.rooms[roomName].spawns) { //can see room
-//       rooms[roomName] = Game.rooms[roomName].spawns
-//         .map((spawn, spawnIndex) => _.sum(Game.creeps, (c) =>
-//           c.memory.role === 'longDistanceHarvester' &&
-//           c.memory.target === roomName &&
-//           c.memory.spawnIndex === spawnIndex));
-//     } else {
-//       rooms[roomName] = ["WhateverIOnlyNeedOneSpawn"]
-//         .map((spawn, spawnIndex) => _.sum(Game.creeps, (c) =>
-//           c.memory.role === 'longDistanceHarvester' &&
-//           c.memory.target === roomName &&
-//           c.memory.spawnIndex === spawnIndex));
-//     }
-//   }
-//   Object.entries(rooms).map(([key, obj]) => console.log(key + ': ' + obj));
-//   Object.entries(rooms)
-//     .map(([roomName, spawns]) => Object.entries(spawns).forEach(([spawnIndex, harvesters]) => {
-//       if (this.memory.minLongDistanceHarvesters[roomName] > harvesters) {
-//         name = this.createLongDistanceHarvester(
-//           Math.min(this.getAvailableEnergy(), 500),
-//           2, this.room.name, roomName, spawnIndex)
-//       }
-//     }));
-// }
-// };
+StructureSpawn.prototype.checkLongDistanceHarvesters = function (name) {
+  Object.entries(this.memory.minLongDistanceHarvesters)
+    .forEach(([roomName, minHarvestersPerSpawn]) => {
+      if (Game.rooms[roomName]) {
+        Game.rooms[roomName].find(FIND_SOURCES).forEach((source, sourceIndex) => {
+          if (minHarvestersPerSpawn > Object.values(Game.creeps).filter(creep => (
+            creep.memory.role === 'longDistanceHarvester' &&
+            creep.memory.target === roomName &&
+            creep.memory.sourceIndex === sourceIndex
+          )).length) {
+            this.createLongDistanceHarvester(
+              Math.min(this.room.energyAvailable, 500),
+              2, this.room.name, roomName, sourceIndex,
+            );
+          }
+        });
+      } else if (minHarvestersPerSpawn >
+        Object.values(Game.creeps).filter(creep => (
+          creep.memory.role === 'longDistanceHarvester' &&
+          creep.memory.target === roomName &&
+          creep.memory.sourceIndex === 0
+        )).length) {
+        this.createLongDistanceHarvester(
+          Math.min(Math.max(250, this.room.energyAvailable), 500),
+          2, this.room.name, roomName, 0,
+        );
+      }
+    });
+};
 
+StructureSpawn.prototype.checkReservers = function (name) {
+  Object.entries(this.memory.minLongDistanceHarvesters)
+    .forEach(([roomName, harvesters]) => {
+      if (Object.values(Game.creeps).filter(creep => (
+        creep.memory.role === 'reserver' &&
+        creep.memory.target === roomName
+      )).length === 0) {
+        this.createReserver(roomName);
+      }
+    });
+};
 // create a new function for StructureSpawn
 StructureSpawn.prototype.createLongDistanceHarvester =
   function (energy, numberOfWorkParts, home, target, sourceIndex) {
@@ -204,6 +224,11 @@ StructureSpawn.prototype.createLongDistanceHarvester =
 StructureSpawn.prototype.createClaimer =
   function (target) {
     return this.spawnCreepWithMemory([CLAIM, MOVE], { role: 'claimer', target });
+  };
+
+StructureSpawn.prototype.createReserver =
+  function (target) {
+    return this.spawnCreepWithMemory([CLAIM, MOVE], { role: 'reserver', target });
   };
 
 // create a new function for StructureSpawn

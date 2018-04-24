@@ -14,5 +14,6 @@ module.exports = {
     "no-plusplus": "off",
     "func-names": "off",
     "guard-for-in": "off",
+    "linebreak-style": "off",
   },
 };
