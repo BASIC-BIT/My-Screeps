@@ -26,8 +26,8 @@ StructureSpawn.prototype.spawnCreepsIfNecessary =
     this.memory.minCreeps = {
       harvester: 4,
       upgrader: 3,
-      builder: 3,
-      lorry: 2,
+      builder: 2,
+      lorry: 0,
       longDistanceHarvester: 0,
       repairer: 2,
       claimer: 0,
@@ -109,9 +109,13 @@ StructureSpawn.prototype.spawnCreepsIfNecessary =
       }
     }
 
-    this.checkReservers(name);
+    if (name === undefined) {
+      this.checkReservers(name);
+    }
 
-    this.checkLongDistanceHarvesters(name);
+    if (name === undefined) {
+      this.checkLongDistanceHarvesters(name);
+    }
 
 
     // print name to console if spawning was a success
