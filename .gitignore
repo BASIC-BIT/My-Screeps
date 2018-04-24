@@ -1,0 +1,5 @@
+.screeps.json
+src/version.js
+node_modules
+.idea
+.git
