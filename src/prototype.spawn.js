@@ -259,7 +259,7 @@ StructureSpawn.prototype.createClaimer =
 
 StructureSpawn.prototype.createReserver =
   function (target) {
-    return this.spawnCreepWithMemory([CLAIM, CLAIM, MOVE, MOVE], { role: 'reserver', target });
+    return this.spawnCreepWithMemory([CLAIM, MOVE], { role: 'reserver', target });
   };
 
 // create a new function for StructureSpawn
