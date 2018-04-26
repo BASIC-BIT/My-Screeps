@@ -206,6 +206,8 @@ StructureSpawn.prototype.checkLongDistanceHarvesters = function (name) {
 StructureSpawn.prototype.checkReservers = function () {
   let spawnTargetRoom;
   Object.entries(this.memory.minLongDistanceHarvesters)
+    .filter(([roomName, harvesters]) =>
+      Game.map.getRoomLinearDistance(roomName, this.room.name) === 1)
     .forEach(([roomName, harvesters]) => {
       if (Object.values(Game.creeps).filter(creep => (
         creep.memory.role === 'reserver' &&
