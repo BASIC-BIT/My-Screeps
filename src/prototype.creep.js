@@ -11,7 +11,6 @@ const roles = {
 
 Creep.prototype.run =
   function () {
-    console.log(`Role: ${this.memory.role} Name: ${this.name} Home: ${this.memory.home} Target: ${this.memory.target} Location: ${this.pos} SourceIndex: ${this.memory.sourceIndex}`);
     roles[this.memory.role].run(this);
   };
 

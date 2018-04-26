@@ -16,6 +16,7 @@ module.exports.loop = function () {
 
   for (const name in Game.creeps) {
     const creep = Game.creeps[name];
+    console.log(`Role: ${creep.memory.role} Name: ${creep.name} Home: ${creep.memory.home} Target: ${creep.memory.target} Location: ${creep.pos} SourceIndex: ${creep.memory.sourceIndex}`);
     if (creep.checkLife()) {
       creep.run();
     }
