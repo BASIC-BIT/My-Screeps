@@ -24,7 +24,8 @@ module.exports = {
             || s.structureType === STRUCTURE_EXTENSION
             || s.structureType === STRUCTURE_TOWER)
             && s.energy < s.energyCapacity) ||
-            (s.structureType === STRUCTURE_CONTAINER
+            ((s.structureType === STRUCTURE_CONTAINER
+              || s.structureType === STRUCTURE_STORAGE)
               && s.store[RESOURCE_ENERGY] < s.storeCapacity),
         });
 
