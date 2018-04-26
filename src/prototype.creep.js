@@ -20,7 +20,7 @@ Creep.prototype.checkLife = function () {
   const spawn = Game.spawns.Spawn1;
   this.memory.staging = this.room.name === this.memory.home && !spawn.hasRenewRoom();
 
-  if (this.ticksToLive < 300) {
+  if (this.ticksToLive < 400) {
     this.memory.renewing = true;
   }
   if (this.ticksToLive > 1350 ||

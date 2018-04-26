@@ -5,6 +5,7 @@ require('./prototype.room');
 
 module.exports.loop = function () {
   console.log(`${'\n'.repeat(30)}------------------------------------`);
+
   for (const name in Memory.creeps) {
     if (Game.creeps[name] === undefined) {
       delete Memory.creeps[name];
