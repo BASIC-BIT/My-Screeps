@@ -7,6 +7,7 @@ StructureTower.prototype.defend = function () {
     if (target) {
       // ...FIRE!
       this.attack(target);
+      return;
     }
 
     target = this.pos.findClosestByRange(FIND_MY_CREEPS, {
@@ -15,6 +16,15 @@ StructureTower.prototype.defend = function () {
 
     if (target) {
       this.heal(target);
+      return;
+    }
+
+    target = this.pos.findClosestByRange(FIND_STRUCTURES, {
+      filter: structure => structure.hits < structure.hitsMax,
+    });
+
+    if (target) {
+      this.repair(target);
     }
   }
 };
