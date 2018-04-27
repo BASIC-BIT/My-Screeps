@@ -38,7 +38,7 @@ StructureSpawn.prototype.getEnergyForCreep = function () {
 StructureSpawn.prototype.spawnCreepsIfNecessary =
   function () {
     this.memory.minCreeps = {
-      harvester: 3,
+      harvester: 6,
       upgrader: 2,
       builder: 2,
       lorry: 4,
@@ -48,7 +48,7 @@ StructureSpawn.prototype.spawnCreepsIfNecessary =
       reserver: 0,
     };
     this.memory.minLongDistanceHarvesters = {
-      W8N2: 4, W7N3: 4, W6N3: 2, W7N4: 2, W7N2: 2,
+      W8N2: 6, W7N3: 6, W6N3: 4, W7N4: 4, W7N2: 4,
     };
     const { room } = this;
     const creepsInRoom = room.find(FIND_MY_CREEPS);
