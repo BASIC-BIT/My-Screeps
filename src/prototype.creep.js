@@ -14,6 +14,10 @@ Creep.prototype.run =
     roles[this.memory.role].run(this);
   };
 
+Creep.prototype.hasClaimBodyPart = function () {
+  return this.body.find(bodyPart => bodyPart.type === CLAIM) !== undefined;
+};
+
 // Manage renewing at a source - return true if should work
 Creep.prototype.checkLife = function () {
   const spawn = Game.spawns.Spawn1;
