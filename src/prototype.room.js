@@ -2,17 +2,16 @@ Room.prototype.refreshMemory = function () {
   this.memory.counter = this.memory.counter ? this.memory.counter + 1 : 1;
   this.setup();
   this.refreshEnergyWaste();
-  if (this.memory.counter % 300 > 50) {
-    this.refreshPositions();
-  }
+  this.refreshPositions();
   if (this.find(FIND_MY_STRUCTURES)
     .filter(structure => structure.structureType === STRUCTURE_SPAWN).length > 0) {
     if (this.memory.counter % 10 === 1) {
       // this.getNextRoadPosition();
     }
     if (this.memory.counter % 300 === 25) {
-      this.createBestNewRoad();
       this.getNextRoadPosition();
+      this.createBestNewRoad();
+      this.clearPositionHistory();
     }
   }
   this.printInfo();
@@ -27,29 +26,26 @@ Room.prototype.createBestNewRoad = function () {
   }
 };
 
+Room.prototype.clearPositionHistory = function () {
+  this.memory.positionHistory = {};
+};
+
 Room.prototype.refreshPositions = function () {
   this.memory.positionHistory = this.getUpdatedPositionMemory(this.memory.positionHistory);
 };
 
 Room.prototype.getAllPositionsWithoutRoads = function () {
-  const positions = [];
-
   const roads = this.find(FIND_STRUCTURES)
     .filter(structure => structure.structureType === STRUCTURE_ROAD)
     .concat(this.find(FIND_CONSTRUCTION_SITES)
       .filter(site => site.structureType === STRUCTURE_ROAD))
     .map(structure => structure.pos);
 
-  for (let x = 1; x <= 48; x++) {
-    for (let y = 0; y <= 48; y++) {
-      const pos = this.getPositionAt(x, y);
-      if (roads.find(item => item.isEqualTo(pos)) === undefined) {
-        positions.push(pos);
-      }
-    }
-  }
-
-  return positions;
+  return Object.values(this.memory.positionHistory)
+    .filter(([position, count]) =>
+      roads.find(road => road.isEqualTo(position)) === undefined
+      && count > 5)
+    .map(([position]) => position);
 };
 
 Room.prototype.getNextRoadPosition = function () {
