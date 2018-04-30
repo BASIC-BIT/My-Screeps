@@ -41,7 +41,7 @@ Room.prototype.getAllPositionsWithoutRoads = function () {
       .filter(site => site.structureType === STRUCTURE_ROAD))
     .map(structure => structure.pos);
 
-  return Object.values(this.memory.positionHistory)
+  return Object.entries(this.memory.positionHistory)
     .filter(([position, count]) =>
       roads.find(road => road.isEqualTo(position)) === undefined
       && count > 5)
