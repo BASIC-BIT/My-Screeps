@@ -2,6 +2,7 @@
 const listOfRoles = ['repairer', 'harvester', 'upgrader', 'builder', 'longDistanceHarvester', 'lorry', 'claimer', 'reserver'];
 
 const randomName = () => Math.random().toString(36).substring(2, 7);
+const MAX_CREEPS_RENEWING_COUNT = 6;
 
 StructureSpawn.prototype.spawnWorker = function (role, memory) {
   const energy = 500;
@@ -23,8 +24,20 @@ StructureSpawn.prototype.spawnCreepWithMemory = function (body, memory) {
   });
 };
 
-StructureSpawn.prototype.hasRenewRoom = function () {
-  return this.pos.findInRange(FIND_MY_CREEPS, 1).length < 5;
+StructureSpawn.prototype.setStagingForRenewingCreeps = function () {
+  this.room.find(FIND_MY_CREEPS)
+    .filter(creep => creep.memory.renewing)
+    .forEach((creep) => { creep.memory.staging = true; });
+
+
+  this.room.find(FIND_MY_CREEPS)
+    .filter(creep => creep.memory.renewing)
+    .sort((a, b) => a.ticksToDecay < b.ticksToDecay)
+    .forEach((creep, index) => {
+      if (index < MAX_CREEPS_RENEWING_COUNT) {
+        creep.memory.staging = false;
+      }
+    });
 };
 
 StructureSpawn.prototype.getEnergyForCreep = function () {

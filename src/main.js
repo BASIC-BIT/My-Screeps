@@ -32,5 +32,6 @@ module.exports.loop = function () {
 
   for (const spawnName in Game.spawns) {
     Game.spawns[spawnName].spawnCreepsIfNecessary();
+    Game.spawns[spawnName].setStagingForRenewingCreeps();
   }
 };
